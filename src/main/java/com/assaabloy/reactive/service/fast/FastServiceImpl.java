@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscriber;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class FastServiceImpl implements FastService {
@@ -22,5 +23,16 @@ class FastServiceImpl implements FastService {
                 subscriber.onCompleted();
             }
         });
+    }
+
+    @Override
+    public Fast getFast() {
+        LOGGER.info("Emitting Fast");
+        return new Fast("I was fetched quickly, number " + COUNT.incrementAndGet());
+    }
+
+    @Override
+    public Callable<Fast> getFastCallable() {
+        return this::getFast;
     }
 }

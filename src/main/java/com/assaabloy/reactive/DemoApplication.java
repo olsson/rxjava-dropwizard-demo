@@ -1,6 +1,7 @@
 package com.assaabloy.reactive;
 
 import com.assaabloy.reactive.resource.DemoResource;
+import com.assaabloy.reactive.service.complex.ComplexService;
 import com.assaabloy.reactive.service.fast.FastService;
 import com.assaabloy.reactive.service.slow.SlowService;
 import io.dropwizard.Application;
@@ -15,6 +16,9 @@ public class DemoApplication extends Application<DemoConfiguration> {
     @Override
     public void run(DemoConfiguration configuration, Environment environment) throws Exception {
         environment.healthChecks().register("health", new DemoHealthCheck());
-        environment.jersey().register(new DemoResource(SlowService.newInstance(), FastService.newInstance()));
+        environment.jersey().register(new DemoResource(
+            SlowService.newInstance(),
+            FastService.newInstance(),
+            ComplexService.newInstance()));
     }
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscriber;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class SlowServiceImpl implements SlowService {
@@ -24,9 +25,26 @@ class SlowServiceImpl implements SlowService {
                     subscriber.onNext(new Slow("I took 1000 ms to fetch. I am number " + COUNT.incrementAndGet()));
                     subscriber.onCompleted();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    throw new IllegalStateException(e);
                 }
             }
         });
+    }
+
+    @Override
+    public Slow getSlow() {
+        try {
+            LOGGER.info("Starting to emit Slow");
+            Thread.sleep(1000);
+            LOGGER.info("Emitting Slow");
+            return new Slow("I took 1000 ms to fetch. I am number " + COUNT.incrementAndGet());
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public Callable<Slow> getSlowCallable() {
+        return this::getSlow;
     }
 }

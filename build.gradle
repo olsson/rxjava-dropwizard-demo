@@ -2,6 +2,7 @@ group 'com.assaabloy.reactive'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'gradle-one-jar'
 
 sourceCompatibility = 1.8
