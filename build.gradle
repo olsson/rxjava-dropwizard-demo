@@ -1,0 +1,41 @@
+group 'com.assaabloy.reactive'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'gradle-one-jar'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+mainClassName = 'com.assaabloy.reactive.DemoApplication'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.3'
+    }
+}
+
+dependencies {
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile 'io.reactivex:rxjava:1.2.1'
+    compile 'org.glassfish.jersey.ext.rx:jersey-rx-client-rxjava:2.23.1'
+    compile 'org.glassfish.jersey.media:jersey-media-sse:2.23.1'
+    compile 'io.dropwizard:dropwizard-core:1.0.3'
+}
+
+task oneJar(type: OneJar) {
+    mainClass = mainClassName
+}
+
+artifacts {
+    oneJar
+}
