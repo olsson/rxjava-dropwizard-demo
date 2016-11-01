@@ -15,19 +15,21 @@ class FastServiceImpl implements FastService {
 
     @Override
     public Observable<Fast> observeFast() {
-        return Observable.create(new Observable.OnSubscribe<Fast>() {
-            @Override
-            public void call(Subscriber<? super Fast> subscriber) {
-                LOGGER.info("Emitting Fast");
-                subscriber.onNext(new Fast("I was fetched quickly, number " + COUNT.incrementAndGet()));
-                subscriber.onCompleted();
-            }
+        return Observable.create(subscriber -> {
+            subscriber.onNext(getFast());
+            subscriber.onCompleted();
         });
     }
 
     @Override
     public Fast getFast() {
-        LOGGER.info("Emitting Fast");
+        LOGGER.info("Fast START");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+        LOGGER.info("Fast DONE");
         return new Fast("I was fetched quickly, number " + COUNT.incrementAndGet());
     }
 

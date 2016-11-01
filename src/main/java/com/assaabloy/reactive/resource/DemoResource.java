@@ -77,6 +77,29 @@ public class DemoResource {
                        .build();
     }
 
+    //
+    // Using CompletableFutures can reduce blocking, but is lacking in operators and difficult to read
+    //
+
+    @GET
+    @Path("/completable-futures")
+    public void getDemoCompletableFutures(@Suspended final AsyncResponse asyncResponse) throws Exception {
+        final CompletableFuture<Fast> futureFast =
+            CompletableFuture.supplyAsync(fastService::getFast, executorService);
+
+        CompletableFuture.supplyAsync(slowService::getSlow, executorService)
+                         .thenApplyAsync(complexService::getComplex, executorService)
+                         .thenCombine(futureFast, Demo::new)
+                         .whenComplete((demo, throwable) -> {
+                             if (throwable != null) {
+                                 asyncResponse.resume(throwable);
+                             }
+                             asyncResponse.resume(demo);
+                         })
+                         .get();
+
+    }
+
 
     //
     // Fully asynchronous RxJava method.
@@ -87,10 +110,10 @@ public class DemoResource {
     public void getDemoAsync(@Suspended final AsyncResponse asyncResponse) {
         slowService.observeSlow()
                    .subscribeOn(Schedulers.io())
+                   .flatMap(complexService::observeComplex)
+                   .subscribeOn(Schedulers.io())
                    .zipWith(fastService.observeFast(), Demo::new)
-                   .doOnNext(asyncResponse::resume)
-                   .doOnError(asyncResponse::resume)
-                   .subscribe();
+                   .subscribe(asyncResponse::resume, asyncResponse::resume);
     }
 
 

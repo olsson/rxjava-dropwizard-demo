@@ -19,7 +19,7 @@ class Demo {
         this.complex = null;
     }
 
-    public Demo(Complex complex, Fast fast) {
+    Demo(Complex complex, Fast fast) {
         this.fast = fast;
         this.complex = complex;
         this.slow = null;
