@@ -23,3 +23,6 @@ To run:
 $ java -jar build/libs/rxdemo-1.0-SNAPSHOT-standalone.jar server src/dist/config/demo.yml
 ```
 
+## What to look at
+
+Check out the examples in [DemoResource.java](src/main/java/com/assaabloy/reactive/resource/DemoResource.java) for the different ways to do async and how they differ from each other.
