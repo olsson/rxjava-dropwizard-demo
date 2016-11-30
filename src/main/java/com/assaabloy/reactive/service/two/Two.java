@@ -1,12 +1,12 @@
-package com.assaabloy.reactive.service.fast;
+package com.assaabloy.reactive.service.two;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Fast {
+public class Two {
 
     private final String message;
 
-    Fast(String message) {
+    Two(String message) {
         this.message = message;
     }
 
@@ -17,7 +17,7 @@ public class Fast {
 
     @Override
     public String toString() {
-        return "Fast{" +
+        return "Two{" +
                 "message='" + message + '\'' +
                 '}';
     }

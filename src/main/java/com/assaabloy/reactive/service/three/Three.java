@@ -1,15 +1,15 @@
-package com.assaabloy.reactive.service.complex;
+package com.assaabloy.reactive.service.three;
 
-import com.assaabloy.reactive.service.slow.Slow;
+import com.assaabloy.reactive.service.one.One;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Complex {
+public class Three {
     private final String message;
-    private final Slow slow;
+    private final One one;
 
-    Complex(String message, Slow slow) {
+    Three(String message, One one) {
         this.message = message;
-        this.slow = slow;
+        this.one = one;
     }
 
     @JsonProperty
@@ -18,15 +18,15 @@ public class Complex {
     }
 
     @JsonProperty
-    public Slow getSlow() {
-        return slow;
+    public One getOne() {
+        return one;
     }
 
     @Override
     public String toString() {
-        return "Complex{" +
+        return "Three{" +
             "message='" + message + '\'' +
-            ", slow=" + slow +
+            ", one=" + one +
             '}';
     }
 }

@@ -1,9 +1,9 @@
 package com.assaabloy.reactive;
 
 import com.assaabloy.reactive.resource.DemoResource;
-import com.assaabloy.reactive.service.complex.ComplexService;
-import com.assaabloy.reactive.service.fast.FastService;
-import com.assaabloy.reactive.service.slow.SlowService;
+import com.assaabloy.reactive.service.three.ThreeService;
+import com.assaabloy.reactive.service.two.TwoService;
+import com.assaabloy.reactive.service.one.OneService;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 
@@ -17,8 +17,8 @@ public class DemoApplication extends Application<DemoConfiguration> {
     public void run(DemoConfiguration configuration, Environment environment) throws Exception {
         environment.healthChecks().register("health", new DemoHealthCheck());
         environment.jersey().register(new DemoResource(
-            SlowService.newInstance(),
-            FastService.newInstance(),
-            ComplexService.newInstance()));
+            OneService.newInstance(),
+            TwoService.newInstance(),
+            ThreeService.newInstance()));
     }
 }

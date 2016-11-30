@@ -1,11 +1,11 @@
 package com.assaabloy.reactive.resource;
 
-import com.assaabloy.reactive.service.complex.Complex;
-import com.assaabloy.reactive.service.complex.ComplexService;
-import com.assaabloy.reactive.service.fast.Fast;
-import com.assaabloy.reactive.service.slow.Slow;
-import com.assaabloy.reactive.service.slow.SlowService;
-import com.assaabloy.reactive.service.fast.FastService;
+import com.assaabloy.reactive.service.three.Three;
+import com.assaabloy.reactive.service.three.ThreeService;
+import com.assaabloy.reactive.service.two.Two;
+import com.assaabloy.reactive.service.two.TwoService;
+import com.assaabloy.reactive.service.one.One;
+import com.assaabloy.reactive.service.one.OneService;
 import rx.schedulers.Schedulers;
 
 import javax.ws.rs.GET;
@@ -15,21 +15,24 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Path("/demo")
 @Produces(MediaType.APPLICATION_JSON)
 public class DemoResource {
 
-    private final SlowService slowService;
-    private final FastService fastService;
-    private final ComplexService complexService;
+    private final OneService oneService;
+    private final TwoService twoService;
+    private final ThreeService threeService;
 
-    public DemoResource(final SlowService slowService, final FastService fastService,
-                        final ComplexService complexService) {
-        this.slowService = slowService;
-        this.fastService = fastService;
-        this.complexService = complexService;
+    public DemoResource(final OneService oneService, final TwoService twoService,
+                        final ThreeService threeService) {
+        this.oneService = oneService;
+        this.twoService = twoService;
+        this.threeService = threeService;
     }
 
     //
@@ -39,10 +42,10 @@ public class DemoResource {
     @GET
     @Path("/blocking")
     public Response getDemoBlocking() {
-        Slow slow = slowService.getSlow();
-        Fast fast = fastService.getFast();
+        One one = oneService.getOne();
+        Two two = twoService.getTwo();
 
-        return Response.ok(new Demo(slow, fast))
+        return Response.ok(new Demo(one, two))
                        .build();
     }
 
@@ -50,13 +53,13 @@ public class DemoResource {
     // Using futures and an executor service works, when the usage is simple
     //
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     @GET
     @Path("/futures")
     public Response getDemoFuture() throws Exception {
-        Future<Slow> slow = executorService.submit(slowService.getSlowCallable());
-        Future<Fast> fast = executorService.submit(fastService.getFastCallable());
+        Future<One> slow = executor.submit(oneService.getOneCallable());
+        Future<Two> fast = executor.submit(twoService.getTwoCallable());
 
         return Response.ok(new Demo(slow.get(), fast.get()))
                        .build();
@@ -69,9 +72,9 @@ public class DemoResource {
     @GET
     @Path("/futures-complex")
     public Response getDemoFutureComplex() throws Exception {
-        Future<Slow> slow = executorService.submit(slowService.getSlowCallable());
-        Future<Complex> complex = executorService.submit(complexService.getComplexCallable(slow.get()));
-        Future<Fast> fast = executorService.submit(fastService.getFastCallable());
+        Future<One> slow = executor.submit(oneService.getOneCallable());
+        Future<Three> complex = executor.submit(threeService.getThreeCallable(slow.get()));
+        Future<Two> fast = executor.submit(twoService.getTwoCallable());
 
         return Response.ok(new Demo(complex.get(), fast.get()))
                        .build();
@@ -83,18 +86,18 @@ public class DemoResource {
 
     @GET
     @Path("/completable-futures")
-    public void getDemoCompletableFutures(@Suspended final AsyncResponse asyncResponse) throws Exception {
-        final CompletableFuture<Fast> futureFast =
-            CompletableFuture.supplyAsync(fastService::getFast, executorService);
+    public void getDemoCompletableFutures(@Suspended AsyncResponse ar) throws Exception {
+        final CompletableFuture<Two> threeFuture =
+            CompletableFuture.supplyAsync(twoService::getTwo, executor);
 
-        CompletableFuture.supplyAsync(slowService::getSlow, executorService)
-                         .thenApplyAsync(complexService::getComplex, executorService)
-                         .thenCombine(futureFast, Demo::new)
+        CompletableFuture.supplyAsync(oneService::getOne, executor)
+                         .thenApplyAsync(threeService::getThree, executor)
+                         .thenCombine(threeFuture, Demo::new)
                          .whenComplete((demo, throwable) -> {
                              if (throwable != null) {
-                                 asyncResponse.resume(throwable);
+                                 ar.resume(throwable);
                              }
-                             asyncResponse.resume(demo);
+                             ar.resume(demo);
                          })
                          .get();
 
@@ -108,12 +111,12 @@ public class DemoResource {
     @GET
     @Path("/async")
     public void getDemoAsync(@Suspended final AsyncResponse asyncResponse) {
-        slowService.observeSlow()
-                   .subscribeOn(Schedulers.io())
-                   .flatMap(complexService::observeComplex)
-                   .subscribeOn(Schedulers.io())
-                   .zipWith(fastService.observeFast(), Demo::new)
-                   .subscribe(asyncResponse::resume, asyncResponse::resume);
+        oneService.observeOne()
+                  .subscribeOn(Schedulers.io())
+                  .flatMap(threeService::observeThree)
+                  .subscribeOn(Schedulers.io())
+                  .zipWith(twoService.observeTwo(), Demo::new)
+                  .subscribe(asyncResponse::resume, asyncResponse::resume);
     }
 
 

@@ -1,4 +1,4 @@
-package com.assaabloy.reactive.service.slow;
+package com.assaabloy.reactive.service.one;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,33 +7,33 @@ import rx.Observable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class SlowServiceImpl implements SlowService {
+class OneServiceImpl implements OneService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlowServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OneServiceImpl.class);
     private static final AtomicInteger COUNT = new AtomicInteger();
 
     @Override
-    public Observable<Slow> observeSlow() {
+    public Observable<One> observeOne() {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getSlow());
+            subscriber.onNext(getOne());
             subscriber.onCompleted();
         });
     }
 
     @Override
-    public Slow getSlow() {
+    public One getOne() {
         try {
-            LOGGER.info("Slow START");
+            LOGGER.info("One START");
             Thread.sleep(1000);
-            LOGGER.info("Slow DONE");
-            return new Slow("I took 1000 ms to fetch. I am number " + COUNT.incrementAndGet());
+            LOGGER.info("One DONE");
+            return new One("I took 1000 ms to fetch. I am number " + COUNT.incrementAndGet());
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public Callable<Slow> getSlowCallable() {
-        return this::getSlow;
+    public Callable<One> getOneCallable() {
+        return this::getOne;
     }
 }

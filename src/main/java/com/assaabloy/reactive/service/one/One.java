@@ -1,12 +1,12 @@
-package com.assaabloy.reactive.service.slow;
+package com.assaabloy.reactive.service.one;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Slow {
+public class One {
 
     private final String message;
 
-    Slow(String message) {
+    One(String message) {
         this.message = message;
     }
 
@@ -17,7 +17,7 @@ public class Slow {
 
     @Override
     public String toString() {
-        return "Slow{" +
+        return "One{" +
                 "message='" + message + '\'' +
                 '}';
     }
