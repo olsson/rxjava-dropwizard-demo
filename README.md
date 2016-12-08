@@ -2,7 +2,7 @@
 
 Using RxJava with Dropwizard is no different than using it with any other framework that uses Jersey.
 
-In this demo app, a two and a one backend service is simulated and combined into a single response. 
+In this demo app, a slow and a fast backend service is simulated and combined into a single response. 
 This is done asynchronously using Jersey's `AsyncResponse` and RxJava's `subscribeOn()`.
 
 ## Prerequisites

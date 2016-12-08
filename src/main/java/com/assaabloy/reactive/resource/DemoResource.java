@@ -1,8 +1,11 @@
 package com.assaabloy.reactive.resource;
 
+import com.assaabloy.reactive.service.one.OneCommand;
 import com.assaabloy.reactive.service.three.Three;
+import com.assaabloy.reactive.service.three.ThreeCommand;
 import com.assaabloy.reactive.service.three.ThreeService;
 import com.assaabloy.reactive.service.two.Two;
+import com.assaabloy.reactive.service.two.TwoCommand;
 import com.assaabloy.reactive.service.two.TwoService;
 import com.assaabloy.reactive.service.one.One;
 import com.assaabloy.reactive.service.one.OneService;
@@ -118,6 +121,21 @@ public class DemoResource {
                   .zipWith(twoService.observeTwo(), Demo::new)
                   .subscribe(asyncResponse::resume, asyncResponse::resume);
     }
+
+    // Asynchronous RxJava method, wrapped with Hystrix
+
+    @GET
+    @Path("/async-hystrix")
+    public void getDemoAsyncHystrix(@Suspended final AsyncResponse asyncResponse) {
+        new OneCommand(oneService).toObservable()
+                  .subscribeOn(Schedulers.io())
+                  .flatMap(one -> new ThreeCommand(threeService, one).toObservable())
+                  .subscribeOn(Schedulers.io())
+                  .zipWith(new TwoCommand(twoService).toObservable(), Demo::new)
+                  .subscribe(asyncResponse::resume, asyncResponse::resume);
+    }
+
+
 
 
 }

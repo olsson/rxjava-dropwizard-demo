@@ -1,2 +1,8 @@
 logging:
   level: INFO
+
+defaultHystrixConfig:
+    hystrix.threadpool.default.maxQueueSize: 50
+    hystrix.threadpool.default.coreSize: 5
+    hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 1000
+    hystrix.command.OneCommand.execution.isolation.thread.timeoutInMilliseconds: 500
